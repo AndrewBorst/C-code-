@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SD = System.Diagnostics;
+using Outlook = Microsoft.Office.Interop.Outlook;
+
+namespace MD
+    {
+    class MdEdiError 
+    {
+        static void Main(string[] args)
+        {
+            MdEdiError mdError = new MdEdiError();
+
+            Outlook.Application application = new Outlook.Application();
+            Outlook.NameSpace ns = application.GetNamespace("Mapi");
+            Outlook.MAPIFolder inboxFolder = ns.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox);
+
+            mdError.PoetFiles(inboxFolder);
+
+        }
+
+        /* Uses current outlook session to grab email attachments and write to Documents\Poetfiles\ folder where 
+         * subject contains 'CSV analysis file for Pre Alert#' */
+        public void PoetFiles(Outlook.MAPIFolder inbox)
+        {
+            string eSubject = "";
+            string sFilter = "@SQL=" + "\"" + "urn:schemas:httpmail:subject" + "\"" + " like '%CSV analysis file for Pre Alert#%'";
+
+            Outlook.Items mailItems = inbox.Items.Restrict(sFilter);
+
+            String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Documents\\PoetFiles\\";
+
+            System.IO.Directory.CreateDirectory(path);
+
+            foreach (Outlook.MailItem item in mailItems)
+            {
+                SD.Trace.WriteLine(item.Subject);
+                SD.Trace.WriteLine(path);
+                item.Attachments[1].SaveAsFile(path + item.Attachments[1].FileName);
+                eSubject = String.Join(eSubject, item.Subject, System.Environment.NewLine);
+            }
+
+            SD.Trace.Write(eSubject);
+
+        }
+
+    }
+}

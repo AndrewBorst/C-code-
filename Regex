@@ -1,0 +1,19 @@
+using System;
+using System.Text.RegularExpressions;
+
+namespace myapp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string pattern = args[0];
+            string subject = args[1];
+            Regex rx = new Regex(pattern);
+            Match m = rx.Match(subject);
+
+            //Console.WriteLine("{0} {1}",m.Success, subject);
+            Console.WriteLine("{0} {1} {2}",m.Success, m.Index, m.Length);
+        }
+    }
+}
